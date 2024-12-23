@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Grade Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 20px auto;
+            max-width: 800px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            border: 1px solid #ccc;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .result-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .result-table th, .result-table td {
+            border: 1px solid #ccc;
+            padding: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Student Grade Calculator</h1>
+
+    <div>
+        <label for="studentName">Student Name:</label>
+        <input type="text" id="studentName">
+    </div>
+
+    <div>
+        <label for="numSubjects">Number of Subjects:</label>
+        <input type="number" id="numSubjects" min="1">
+    </div>
+
+    <button onclick="addSubjectRows()">Add Subjects</button>
+
+    <table id="subjectTable"></table>
+
+    <button onclick="calculateGrades()">Calculate Grades</button>
+
+    <div id="result"></div>
+
+    <script>
+        let students = [];
+
+        // Function to add rows for subjects
+        function addSubjectRows() {
+            const numSubjects = parseInt(document.getElementById("numSubjects").value);
+            const subjectTable = document.getElementById("subjectTable");
+            subjectTable.innerHTML = "";
+
+            // Table header
+            const header = subjectTable.createTHead();
+            const headerRow = header.insertRow(0);
+            headerRow.insertCell(0).innerText = "Subject";
+            headerRow.insertCell(1).innerText = "Grade";
+
+            // Table body for subject rows
+            const body = subjectTable.createTBody();
+            for (let i = 0; i < numSubjects; i++) {
+                const row = body.insertRow();
+                const cell1 = row.insertCell(0);
+                const cell2 = row.insertCell(1);
+                cell1.innerHTML = `<input type="text" placeholder="Subject ${i + 1}">`;
+                cell2.innerHTML = `<input type="number" min="0" max="100" placeholder="Grade">`;
+            }
+        }
+
+        // Function to calculate grades and display results
+        function calculateGrades() {
+            const studentName = document.getElementById("studentName").value;
+            const subjectRows = document.getElementById("subjectTable").getElementsByTagName("tr");
+            let totalGrades = 0;
+            let subjects = [];
+
+            // Loop through each row of subjects and grades
+            for (let i = 1; i < subjectRows.length; i++) {  // Start from 1 to skip header row
+                const subjectName = subjectRows[i].cells[0].children[0].value;
+                const grade = parseFloat(subjectRows[i].cells[1].children[0].value);
+
+                if (!isNaN(grade) && grade >= 0 && grade <= 100) {
+                    totalGrades += grade;
+                    subjects.push({ name: subjectName, grade: grade });
+                } else {
+                    alert("Invalid grade for " + subjectName + ". Please enter a number between 0 and 100.");
+                    return;
+                }
+            }
+
+            if (subjects.length === 0) {
+                alert("Please enter grades for all subjects.");
+                return;
+            }
+
+            const average = totalGrades / subjects.length;
+            const studentData = { name: studentName, subjects: subjects, average: average };
+
+            students.push(studentData);
+
+            // Display the calculated results
+            const resultDiv = document.getElementById("result");
+            resultDiv.innerHTML = `
+                <h3>Student Information</h3>
+                <table class="result-table">
+                    <tr>
+                        <th>Subject</th>
+                        <th>Grade</th>
+                    </tr>
+                    ${subjects.map(subject => `
+                        <tr>
+                            <td>${subject.name}</td>
+                            <td>${subject.grade}</td>
+                        </tr>
+                    `).join('')}
+                    <tr>
+                        <td><strong>Average Grade</strong></td>
+                        <td><strong>${average.toFixed(2)}</strong></td>
+                    </tr>
+                </table>
+            `;
+        }
+    </script>
+
+</body>
+</html>
